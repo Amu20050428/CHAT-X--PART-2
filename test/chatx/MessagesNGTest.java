@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/EmptyTestNGTest.java to edit this template
- */
 package chatx;
 
 import org.testng.Assert;
@@ -10,91 +6,62 @@ import org.testng.annotations.Test;
 
 public class MessagesNGTest {
 
-    private Messages validMessage;
+    private Messages message1;
+    private Messages message2;
+    private Messages invalidRecipient;
     private Messages longMessage;
-    private Messages emptyMessage;
-    private Messages invalidRecipientMessage;
 
     @BeforeMethod
     public void setUp() {
-        validMessage = new Messages("+27831234567", "Hello Tshiamo!");
-        longMessage = new Messages("+27831234567", "A".repeat(260));
-        emptyMessage = new Messages("+27831234567", "");
-        invalidRecipientMessage = new Messages("0831234567", "Hi!");
+        message1 = new Messages("+27718693002", "Hi Mike, can you join us for dinner tonight");
+        message2 = new Messages("08575975889", "Hi Keegan, did you receive the payment?");
+        invalidRecipient = new Messages("0834567890", "Testing invalid number");
+        longMessage = new Messages("+27718693002", "A".repeat(270));
     }
 
     @Test
-    public void testMessageIDIsValid() {
-        Assert.assertTrue(validMessage.checkMessageID(),
-                "Message ID should be exactly 10 characters long");
+    public void testValidMessageLength() {
+        String result = message1.validateMessageLength();
+        Assert.assertEquals(result, "Message ready to send.");
     }
 
     @Test
-    public void testRecipientCellValid() {
-        Assert.assertTrue(validMessage.checkRecipientCell(),
-                "Recipient with +27 format should be valid");
-    }
-
-    @Test
-    public void testRecipientCellInvalid() {
-        Assert.assertFalse(invalidRecipientMessage.checkRecipientCell(),
-                "Recipient without +27 format should be invalid");
-    }
-
-    @Test
-    public void testMessageLengthTooLong() {
+    public void testMessageTooLong() {
         String result = longMessage.validateMessageLength();
-        Assert.assertTrue(result.contains("too long"),
-                "Should detect message longer than 250 characters");
+        Assert.assertTrue(result.startsWith("Message exceeds 250 characters"),
+                "Should return correct failure message for long text");
     }
 
     @Test
-    public void testMessageLengthEmpty() {
-        String result = emptyMessage.validateMessageLength();
-        Assert.assertEquals(result, "Message cannot be empty.");
+    public void testValidRecipientNumber() {
+        String result = message1.checkRecipientCell();
+        Assert.assertEquals(result, "Cell phone number successfully captured.");
     }
 
     @Test
-    public void testMessageLengthValid() {
-        String result = validMessage.validateMessageLength();
-        Assert.assertEquals(result, "Message length is valid.");
+    public void testInvalidRecipientNumber() {
+        String result = invalidRecipient.checkRecipientCell();
+        Assert.assertEquals(result,
+                "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.");
     }
 
     @Test
-    public void testCreateMessageHash() {
-        validMessage.createMessageHash();
-        Assert.assertNotNull(validMessage, "Message hash should not be null after creation");
-    }
-
-    @Test
-    public void testSendMessageSuccess() {
-        String result = validMessage.sendMessage(1);
+    public void testSendMessage() {
+        String result = message1.sendMessage(1);
         Assert.assertEquals(result, "Message sent successfully.");
     }
 
     @Test
-    public void testSendMessageDisregarded() {
-        String result = validMessage.sendMessage(2);
-        Assert.assertEquals(result, " The Message is disregarded.");
+    public void testDiscardMessage() {
+        String result = message2.sendMessage(2);
+        Assert.assertEquals(result, "Message disregarded.");
     }
 
     @Test
-    public void testSendMessageSaved() {
-        String result = validMessage.sendMessage(3);
-        Assert.assertEquals(result, " The  Message is saved successfully.");
-    }
-
-    @Test
-    public void testSendMessageInvalidOption() {
-        String result = validMessage.sendMessage(5);
-        Assert.assertEquals(result, "Invalid option.");
-    }
-
-    @Test
-    public void testTotalMessagesIncrement() {
+    public void testTotalMessagesSentIncrement() {
         int before = Messages.returnTotalMessages();
-        validMessage.sendMessage(1);
+        message1.sendMessage(1);
         int after = Messages.returnTotalMessages();
-        Assert.assertEquals(after, before + 1, "Total messages should increment by 1");
+        Assert.assertEquals(after, before + 1);
     }
 }

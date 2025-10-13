@@ -1,7 +1,7 @@
 package chatx;
 
-import javax.swing.JOptionPane;
 import org.json.JSONObject;
+import javax.swing.JOptionPane;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
@@ -9,7 +9,6 @@ import java.util.Random;
 public class Messages {
     // Variables
     private static int totalMessagesSent = 0;
-    private static int messageCounter = 0;
 
     private String messageID;
     private String recipient;
@@ -23,47 +22,45 @@ public class Messages {
         this.messageID = generateMessageID();
     }
 
-    // Method to generate a random message ID
+    // Generate message ID
     private String generateMessageID() {
         Random rand = new Random();
         long randomNum = 1000000000L + (long) (rand.nextDouble() * 8999999999L);
         return String.valueOf(randomNum);
     }
 
-    // Check if message ID is valid
+    // Check message ID validity
     public boolean checkMessageID() {
         return messageID.length() == 10;
     }
 
-    // Check if cellphone number is valid
-    public boolean checkRecipientCell() {
+    // Validate cellphone number format
+    public String checkRecipientCell() {
         if (recipient.startsWith("+27") && recipient.length() == 12) {
-            return true;
+            return "Cell phone number successfully captured.";
         } else {
-            JOptionPane.showMessageDialog(null,
-                "Invalid cellphone number format. Please use +27 followed by 9 digits.");
-            return false;
+            return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
         }
     }
 
-    // Validate the length of the message
+    // Validate message length
     public String validateMessageLength() {
         if (messageText.length() > 250) {
             int diff = messageText.length() - 250;
-            return "Message is too long by " + diff + " characters.";
+            return "Message exceeds 250 characters by " + diff + ", please reduce size.";
         } else if (messageText.isEmpty()) {
             return "Message cannot be empty.";
         } else {
-            return "Message length is valid.";
+            return "Message ready to send.";
         }
     }
 
-    // Create a hash for the message
+    // Create message hash
     public void createMessageHash() {
         this.messageHash = Integer.toHexString(messageText.hashCode());
     }
 
-    // Choose what to do with the message
+    // Choose message action
     public String sendMessage(int action) {
         switch (action) {
             case 1:
@@ -79,7 +76,7 @@ public class Messages {
         }
     }
 
-    // Save the message to a JSON file
+    // Save message to JSON
     public void saveMessageToJSON() {
         JSONObject messageObj = new JSONObject();
         messageObj.put("messageID", messageID);
@@ -92,16 +89,6 @@ public class Messages {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error saving message: " + e.getMessage());
         }
-    }
-
-    // Display message details
-    public void printMessageDetails() {
-        JOptionPane.showMessageDialog(null,
-            "Message Details:\n" +
-            "Message ID: " + messageID + "\n" +
-            "Recipient: " + recipient + "\n" +
-            "Text: " + messageText + "\n" +
-            "Hash: " + messageHash);
     }
 
     // Return total messages sent

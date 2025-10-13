@@ -8,15 +8,17 @@ public class ChatX {
         Methods user = null;  // user object placeholder
         String choice;
 
-        JOptionPane.showMessageDialog(null, "Welcome to ChatX!\nYour personal chat.", 
-                                      "ChatX", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, 
+            "Welcome to ChatX!\nYour personal chat.", 
+            "ChatX", 
+            JOptionPane.INFORMATION_MESSAGE);
 
         do {
             choice = JOptionPane.showInputDialog(
                 "==== ChatX Menu ====\n"
-              + "1️⃣  Register\n"
-              + "2️⃣  Login\n"
-              + "3️⃣  Exit\n\n"
+              + "1. Register\n"
+              + "2. Login\n"
+              + "3. Exit\n\n"
               + "Enter your choice:"
             );
 
@@ -45,9 +47,12 @@ public class ChatX {
 
                     if (result.startsWith("Welcome")) {
                         // Proceed to message menu
-                        JOptionPane.showMessageDialog(null, "✅ Login successful! Welcome to ChatX Messaging.");
+                        JOptionPane.showMessageDialog(null, 
+                            "✅ Login successful! Welcome to ChatX Messaging.");
 
-                        int numMessages = Integer.parseInt(JOptionPane.showInputDialog("How many messages would you like to send?"));
+                        int numMessages = Integer.parseInt(
+                            JOptionPane.showInputDialog("How many messages would you like to send?")
+                        );
 
                         for (int i = 0; i < numMessages; i++) {
                             String recipient = JOptionPane.showInputDialog("Enter recipient cellphone (+27...):");
@@ -55,9 +60,10 @@ public class ChatX {
 
                             Messages msg = new Messages(recipient, text);
 
-                            if (!msg.checkRecipientCell()) {
-                                JOptionPane.showMessageDialog(null, 
-                                    "❌ Invalid cellphone number format. Please use +27... format.");
+                            // ✅ FIXED: check recipient format using String response
+                            String cellCheck = msg.checkRecipientCell();
+                            if (!cellCheck.equals("Cell phone number successfully captured.")) {
+                                JOptionPane.showMessageDialog(null, "❌ " + cellCheck);
                                 i--; // allow retry
                                 continue;
                             }
@@ -68,7 +74,8 @@ public class ChatX {
                             msg.saveMessageToJSON();
 
                             String[] options = {"Send", "Disregard", "Store"};
-                            int action = JOptionPane.showOptionDialog(null, 
+                            int action = JOptionPane.showOptionDialog(
+                                null,
                                 "Choose an action for this message:",
                                 "Message Options",
                                 JOptionPane.DEFAULT_OPTION,
@@ -80,7 +87,12 @@ public class ChatX {
 
                             String status = msg.sendMessage(action + 1);
                             JOptionPane.showMessageDialog(null, status);
-                            msg.printMessageDetails();
+
+                            // ✅ FIXED: show message details safely
+                            JOptionPane.showMessageDialog(null,
+                                "Message Details:\n" +
+                                "Recipient: " + recipient + "\n" +
+                                "Text: " + text);
                         }
 
                         JOptionPane.showMessageDialog(null, 
